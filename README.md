@@ -1,6 +1,6 @@
 # Lambda Project
 
-> A simple Lambda project for demonstration.
+> Lambda Project is an open-source project based on Java 8, designed to provide practical tools and functional extensions to enhance development efficiency and code conciseness.
 
 ## 📄 项目简介
 
@@ -23,10 +23,9 @@
 <dependency>
     <groupId>com.github.zhitron</groupId>
     <artifactId>lambda</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
-
 
 ---
 
@@ -35,6 +34,123 @@
 - 支持链式调用和函数组合
 - 提供常用函数接口扩展
 - 简化集合操作与流式处理
+
+## 🔧 使用指南
+
+本项目提供了多种函数式接口，并支持返回值类型和异常处理。适用于简化 Java 中的 Lambda 表达式使用。
+
+### ✅ 1. 函数式接口分类
+
+#### 1.1 无参函数（NonParameter）
+
+适用于不接受任何参数的 Lambda 函数，支持以下返回类型：
+
+- `ToAny<R>`：通用泛型返回值
+- `ToVoid`：无返回值
+- `ToBoolean`：布尔值
+- `ToChar`：字符值
+- `ToByte`：字节值
+- `ToShort`：短整型值
+- `ToInt`：整型值
+- `ToLong`：长整型值
+- `ToFloat`：浮点值
+- `ToDouble`：双精度浮点值
+
+同时支持抛出异常的版本：NonParameterThrow
+
+#### 1.2 单参数函数（SingleParameter）
+
+适用于接受一个参数的 Lambda 函数，支持上述相同类型的返回值。
+接口命名示例：`SingleParameter.ToAny<T, R>`
+
+支持异常处理的版本：SingleParameterThrow
+
+#### 1.3 双参数函数（TwiceParameter）
+
+适用于接受两个参数的 Lambda 函数。
+接口命名示例：`TwiceParameter.ToAny<T, U, R>`
+
+支持异常处理的版本：TwiceParameterThrow
+
+#### 1.4 三参数函数（TripleParameter）
+
+适用于接受三个参数的 Lambda 函数。
+接口命名示例：`TripleParameter.ToAny<T, U, V, R>`
+
+支持异常处理的版本：TripleParameterThrow
+
+#### 1.5 四参数函数（QuadrupleParameter）
+
+适用于接受四个参数的 Lambda 函数。
+接口命名示例：`QuadrupleParameter.ToAny<T, U, V, W, R>`
+
+支持异常处理的版本：QuadrupleParameterThrow
+
+---
+
+### ✅ 2. 异常处理支持
+
+所有接口都提供两个版本：
+
+- **基础版本**：不抛出异常
+- **Throw 版本**：通过 `applyThrow(...)` 方法允许抛出检查性异常（checked exception），并默认将异常包装为 `RuntimeException`
+
+示例：
+
+```java
+SingleParameterThrow.ToAny<String, Integer, Exception> parser = Integer::parseInt;
+Integer result = parser.apply("123"); // 正常调用
+```
+
+---
+
+### ✅ 3. 典型使用场景
+
+- 简化集合遍历与操作（如 `forEach`, `map`, `filter` 等）
+- 定义带异常处理的回调逻辑
+- 构建链式 API 或 DSL
+- 替代匿名内部类，提升代码可读性和复用性
+
+---
+
+### ✅ 4. 示例代码
+
+#### 示例 1：使用无参函数
+
+```java
+NonParameter.ToInt random = () -> new Random().nextInt(100);
+System.out.
+
+println(random.apply());
+```
+
+#### 示例 2：使用单参函数
+
+```java
+SingleParameter.ToBoolean<String> isEmpty = String::isEmpty;
+System.out.
+
+println(isEmpty.apply("")); // true
+```
+
+#### 示例 3：使用双参函数 + 异常处理
+
+```java
+TwiceParameterThrow.ToAny<String, String, Integer, NumberFormatException> parse =
+        Integer::valueOf;
+
+try{
+int result = parse.apply("123", "456");
+    System.out.
+
+println(result); // 456
+}catch(
+NumberFormatException e){
+        e.
+
+printStackTrace();
+}
+```
 
 ---
 
