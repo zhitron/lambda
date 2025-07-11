@@ -6,7 +6,7 @@
 
     <groupId>io.github.zhitron</groupId>
     <artifactId>lambda</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <name>Lambda Project</name>
     <description>
         Lambda Project is an open-source project based on Java 8, designed to provide practical tools and functional extensions to enhance development efficiency and code conciseness.
@@ -93,6 +93,7 @@
                         </goals>
                         <configuration>
                             <failOnError>false</failOnError>
+                            <quiet>true</quiet>
                         </configuration>
                     </execution>
                 </executions>
