@@ -1,6 +1,6 @@
 # Lambda Project
 
-> Lambda Project is an open-source project based on Java 8, designed to provide practical tools and functional extensions to enhance development efficiency and code conciseness.
+`Lambda Project`是基于 Java 8 的开源项目，旨在提供实用工具和功能扩展，以提高开发效率和代码简洁性。
 
 ## 📄 项目简介
 
@@ -23,7 +23,7 @@
 <dependency>
     <groupId>com.github.zhitron</groupId>
     <artifactId>lambda</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
@@ -118,37 +118,54 @@ Integer result = parser.apply("123"); // 正常调用
 #### 示例 1：使用无参函数
 
 ```java
-NonParameter.ToInt random = () -> new Random().nextInt(100);
-System.out.
+package com.github.zhitron.lambda;
 
-println(random.apply());
+/**
+ * @author zhitron
+ */
+public class Test {
+    public static void main(String[] args) {
+        NonParameter.ToInt random = () -> new Random().nextInt(100);
+        System.out.println(random.apply());
+    }
+}
 ```
 
 #### 示例 2：使用单参函数
 
 ```java
-SingleParameter.ToBoolean<String> isEmpty = String::isEmpty;
-System.out.
+package com.github.zhitron.lambda;
 
-println(isEmpty.apply("")); // true
+/**
+ * @author zhitron
+ */
+public class Test {
+    public static void main(String[] args) {
+        SingleParameter.ToBoolean<String> isEmpty = String::isEmpty;
+        System.out.println(isEmpty.apply(""));
+    }
+}
 ```
 
 #### 示例 3：使用双参函数 + 异常处理
 
 ```java
-TwiceParameterThrow.ToAny<String, String, Integer, NumberFormatException> parse =
-        Integer::valueOf;
+package com.github.zhitron.lambda;
 
-try{
-int result = parse.apply("123", "456");
-    System.out.
+/**
+ * @author zhitron
+ */
+public class Test {
+    public static void main(String[] args) {
+        TwiceParameterThrow.ToAny<String, String, Integer, NumberFormatException> parse = Integer::valueOf;
 
-println(result); // 456
-}catch(
-NumberFormatException e){
-        e.
-
-printStackTrace();
+        try {
+            int result = parse.apply("123", "456");
+            System.out.println(result);
+        } catch (NumberFormatException e) {
+            e.printStackTrace(System.err);
+        }
+    }
 }
 ```
 
@@ -164,7 +181,7 @@ printStackTrace();
 
 ## 📦 发布状态
 
-当前版本：`1.0.0`
+当前版本：`1.2.0`
 
 该项目已发布至 [Maven Central](https://search.maven.org/)，支持快照版本与正式版本部署。
 
@@ -179,7 +196,6 @@ GitHub 地址：[https://github.com/zhitron/lambda](https://github.com/zhitron/l
 ```bash
 git clone https://github.com/zhitron/lambda.git
 ```
-
 
 ---
 
