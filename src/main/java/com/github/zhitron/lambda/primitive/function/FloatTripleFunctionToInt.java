@@ -1,0 +1,22 @@
+package com.github.zhitron.lambda.primitive.function;
+
+/**
+ * 表示一个接收三个 float 参数并生成结果的函数。
+ * 这是 TriFunction 接口针对 float 类型的原始类型特化版本。
+ *
+ * <p>这是一个函数式接口，其函数式方法为 apply(float, float, float)。
+ *
+ * @author zhitron
+ */
+@FunctionalInterface
+public interface FloatTripleFunctionToInt {
+    /**
+     * 在给定参数上生成结果。
+     *
+     * @param input 输入参数
+     * @param value 另一个输入参数
+     * @param other 第三个输入参数
+     * @return 返回一个结果
+     */
+    char apply(float input, float value, float other);
+}
