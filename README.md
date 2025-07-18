@@ -23,7 +23,7 @@
 <dependency>
     <groupId>com.github.zhitron</groupId>
     <artifactId>lambda</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 
@@ -34,6 +34,7 @@
 - 支持链式调用和函数组合
 - 提供常用函数接口扩展
 - 简化集合操作与流式处理
+- 支持原生类型与泛型的函数
 
 ## 🔧 使用指南
 
@@ -85,6 +86,13 @@
 接口命名示例：`QuadrupleParameter.ToAny<T, U, V, W, R>`
 
 支持异常处理的版本：QuadrupleParameterThrow
+
+#### 1.6 其它函数
+
+- 消费器函数：`com.github.zhitron.lambda.consumer`
+- 处理器函数：`com.github.zhitron.lambda.function`
+- 断言器函数：`com.github.zhitron.lambda.predicate`
+- 提供器函数：`com.github.zhitron.lambda.supplier`
 
 ---
 
