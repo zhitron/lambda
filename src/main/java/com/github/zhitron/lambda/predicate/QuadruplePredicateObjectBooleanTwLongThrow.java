@@ -1,7 +1,9 @@
 package com.github.zhitron.lambda.predicate;
 
+import com.github.zhitron.BasicConstant;
+
 /**
- * 这是一个通用的 lambda 函数类，输入 4 个参的操作，并返回一个布尔值。支持抛出异常。
+ * 这是一个通用的 lambda 函数类，输入 4 个参数的操作，并返回一个布尔值。支持抛出异常。
  * 该接口扩展自 {@link QuadruplePredicateObjectBooleanTwLong}，增加了异常处理能力。
  *
  * @param <T> 第 1 个参数类型。
@@ -10,6 +12,27 @@ package com.github.zhitron.lambda.predicate;
  */
 @FunctionalInterface
 public interface QuadruplePredicateObjectBooleanTwLongThrow<T, E extends Exception> extends QuadruplePredicateObjectBooleanTwLong<T> {
+
+    /**
+     * 默认返回 true 的 QuadruplePredicateObjectBooleanTwLongThrow 实例。
+     */
+    QuadruplePredicateObjectBooleanTwLongThrow<?, ?> DEFAULT_TRUE = (v1, v2, v3, v4) -> BasicConstant.BOOLEAN_TRUE;
+
+    /**
+     * 默认返回 false 的 QuadruplePredicateObjectBooleanTwLongThrow 实例。
+     */
+    QuadruplePredicateObjectBooleanTwLongThrow<?, ?> DEFAULT_FALSE = (v1, v2, v3, v4) -> BasicConstant.BOOLEAN_FALSE;
+
+    /**
+     * 根据给定的布尔值返回对应的默认 QuadruplePredicateObjectBooleanTwLongThrow 实例。
+     *
+     * @param value 给定的布尔值。
+     * @return 如果 value 为 true，返回 DEFAULT_TRUE；否则返回 DEFAULT_FALSE。
+     */
+    @SuppressWarnings("unchecked")
+    static <T, E extends Exception> QuadruplePredicateObjectBooleanTwLongThrow<T, E> constant(boolean value) {
+        return (QuadruplePredicateObjectBooleanTwLongThrow<T, E>) (value ? DEFAULT_TRUE : DEFAULT_FALSE);
+    }
 
     /**
      * 对给定的 4 个参数进行操作，并返回一个布尔值。

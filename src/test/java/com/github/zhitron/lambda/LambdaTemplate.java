@@ -1,133 +1,24 @@
 package com.github.zhitron.lambda;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Objects;
+import static com.github.zhitron.lambda.LambdaType.BOOLEAN;
+import static com.github.zhitron.lambda.LambdaType.OBJECT;
 
 /**
+ * LambdaTemplate 是一个用于生成 Lambda 表达式模板代码的类。
+ * 它继承自 TemplateInfo，根据给定的返回类型和参数类型生成相应的函数式接口代码。
+ *
  * @author zhitron
  */
-class LambdaTemplate {
-    private final String methodName;
-    private final LambdaType returnType;
-    private final LambdaType[] paramTypes;
-    private final int genericCount;
+class LambdaTemplate extends TemplateInformation {
 
     /**
      * 构造函数
      *
-     * @param returnType 返回类型，如果为null表示Consumer，如果为LambdaType.TEST表示Predicate，否则表示Function
+     * @param returnType 返回类型，如果为null表示Consumer，如果为TEST表示Predicate，否则表示Function
      * @param paramTypes 参数类型数组
      */
     public LambdaTemplate(LambdaType returnType, LambdaType... paramTypes) {
-        // 如果没有返回类型，则默认为"accept"方法
-        // 如果返回类型是TEST，则使用"test"方法
-        // 否则使用"apply"方法
-        this.methodName = returnType == null ? "accept" : (returnType == LambdaType.TEST ? "test" : "apply");
-        this.returnType = returnType;
-
-        // 过滤掉null值参数
-        this.paramTypes = Arrays.stream(paramTypes).filter(Objects::nonNull).toArray(LambdaType[]::new);
-
-        // 统计泛型参数的数量
-        this.genericCount = (int) Arrays.stream(this.paramTypes).filter(LambdaType::isGeneric).count();
-    }
-
-    /**
-     * 获取生成的类名
-     *
-     * @param isThrowException 是否支持抛出异常
-     * @return 生成的类名
-     */
-    public String getClassName(boolean isThrowException) {
-        StringBuilder sb = new StringBuilder();
-
-        // 根据参数个数添加前缀
-        switch (paramTypes.length) {
-            case 1:
-                sb.append("Single");
-                break;
-            case 2:
-                sb.append("Twice");
-                break;
-            case 3:
-                sb.append("Triple");
-                break;
-            case 4:
-                sb.append("Quadruple");
-                break;
-            default:
-                throw new IllegalArgumentException("参数个数错误");
-        }
-
-        // 根据返回类型添加后缀
-        if (returnType == null) {
-            sb.append("Consumer");
-        } else {
-            if (returnType == LambdaType.TEST) {
-                sb.append("Predicate");
-            } else {
-                sb.append("Function");
-            }
-        }
-
-        // 检查所有参数类型是否相同
-        boolean isSame = true;
-        LambdaType last = paramTypes[0];
-        for (int i = 1; i < paramTypes.length; i++) {
-            if (last != paramTypes[i]) {
-                isSame = false;
-                break;
-            }
-        }
-
-        // 如果所有参数类型相同，直接添加类型名称
-        if (isSame) {
-            sb.append(last.getCapitalizedName());
-        } else {
-            // 否则按连续相同类型分组添加名称
-            int count = 1;
-            for (int i = 1; i <= paramTypes.length; i++) {
-                assert last != null;
-                if (i == paramTypes.length || last != paramTypes[i]) {
-                    switch (count) {
-                        case 1:
-                            sb.append(last.getCapitalizedName());
-                            break;
-                        case 2:
-                            sb.append("Tw").append(last.getCapitalizedName());
-                            break;
-                        case 3:
-                            sb.append("Tri").append(last.getCapitalizedName());
-                            break;
-                        case 4:
-                            sb.append("Quad").append(last.getCapitalizedName());
-                            break;
-                        default:
-                            throw new IllegalArgumentException("参数个数错误");
-                    }
-                    count = 1;
-                    last = i == paramTypes.length ? null : paramTypes[i];
-                } else {
-                    count++;
-                }
-            }
-        }
-
-        // 如果是Function类型，添加返回类型
-        if (returnType != null && returnType != LambdaType.TEST) {
-            sb.append("To").append(returnType.getCapitalizedName());
-        }
-
-        // 如果支持抛出异常，添加Throw后缀
-        if (isThrowException) {
-            sb.append("Throw");
-        }
-
-        return sb.toString();
+        super(returnType == null ? "accept" : (returnType == BOOLEAN ? "test" : "apply"), returnType, paramTypes);
     }
 
     /**
@@ -136,26 +27,30 @@ class LambdaTemplate {
      * @param isThrowException 是否支持抛出异常
      * @return 生成的Java代码字符串
      */
-    public String getResult(boolean isThrowException) {
+    public String generate(boolean isThrowException) {
         StringBuilder sb = new StringBuilder();
 
         // 包声明
         sb.append("package com.github.zhitron.lambda");
         if (returnType == null) {
             sb.append(".consumer");
-        } else if (returnType == LambdaType.TEST) {
+        } else if (returnType == BOOLEAN) {
             sb.append(".predicate");
         } else {
             sb.append(".function");
         }
         sb.append(";").append("\n");
         sb.append("\n");
+        if (returnType != null && returnType != OBJECT) {
+            sb.append("import com.github.zhitron.BasicConstant;").append("\n");
+            sb.append("\n");
+        }
 
         // 类注释
         sb.append("/**").append("\n");
-        sb.append(" * 这是一个通用的 lambda 函数类，输入 ").append(paramTypes.length).append(" 个参的操作");
+        sb.append(" * 这是一个通用的 lambda 函数类，输入 ").append(paramTypes.length).append(" 个参数的操作");
         if (returnType != null) {
-            if (returnType == LambdaType.TEST) {
+            if (returnType == BOOLEAN) {
                 sb.append("，并返回一个布尔值。");
             } else {
                 sb.append("，并返回一个结果。");
@@ -193,31 +88,13 @@ class LambdaTemplate {
         sb.append("public interface ").append(getClassName(isThrowException));
 
         // 泛型声明
-        if (genericCount > 0 || (returnType != null && returnType.isGeneric()) || isThrowException) {
-            sb.append("<");
-            if (genericCount > 0) {
-                for (int i = 0; i < paramTypes.length; i++) {
-                    if (paramTypes[i].isGeneric()) {
-                        sb.append(paramTypes[i].getParamType(i)).append(", ");
-                    }
-                }
-            }
-            if (returnType != null && returnType.isGeneric()) {
-                sb.append(returnType.getReturnType()).append(", ");
-            }
-            if (isThrowException) {
-                sb.append("E extends Exception");
-            } else {
-                sb.setLength(sb.length() - 2);
-            }
-            sb.append(">");
-        }
+        sb.append(getGenericDeclaration(isThrowException));
 
         // 继承声明
         if (isThrowException) {
             sb.append(" extends ").append(getClassName(false));
 
-            if (genericCount > 0 || (returnType != null && returnType.isGeneric())) {
+            if (hasGeneric(true)) {
                 sb.append("<");
                 if (genericCount > 0) {
                     for (int i = 0; i < paramTypes.length; i++) {
@@ -236,11 +113,130 @@ class LambdaTemplate {
         sb.append(" {").append("\n");
         sb.append("\n");
 
+        // 方法声明
+        if (returnType == BOOLEAN) {
+            sb.append("    /**").append("\n");
+            sb.append("     * 默认返回 true 的 ").append(getClassName(isThrowException)).append(" 实例。").append("\n");
+            sb.append("     */").append("\n");
+            sb.append("    ").append(getClassName(isThrowException)).append(getGenericUnknown(isThrowException)).append(" DEFAULT_TRUE = (").append(getParamInvocation()).append(") -> BasicConstant.BOOLEAN_TRUE;").append("\n");
+            sb.append("\n");
+            sb.append("    /**").append("\n");
+            sb.append("     * 默认返回 false 的 ").append(getClassName(isThrowException)).append(" 实例。").append("\n");
+            sb.append("     */").append("\n");
+            sb.append("    ").append(getClassName(isThrowException)).append(getGenericUnknown(isThrowException)).append(" DEFAULT_FALSE = (").append(getParamInvocation()).append(") -> BasicConstant.BOOLEAN_FALSE;").append("\n");
+            sb.append("\n");
+            sb.append("    /**").append("\n");
+            sb.append("     * 根据给定的布尔值返回对应的默认 ").append(getClassName(isThrowException)).append(" 实例。").append("\n");
+            sb.append("     *").append("\n");
+            sb.append("     * @param value 给定的布尔值。").append("\n");
+            sb.append("     * @return 如果 value 为 true，返回 DEFAULT_TRUE；否则返回 DEFAULT_FALSE。").append("\n");
+            sb.append("     */").append("\n");
+
+            if (hasGeneric(isThrowException)) {
+                sb.append("    @SuppressWarnings(\"unchecked\")").append("\n");
+            }
+            sb.append("    static ");
+            String genericDeclaration = getGenericDeclaration(isThrowException);
+            if (!genericDeclaration.isEmpty()) {
+                sb.append(genericDeclaration).append(" ");
+            }
+            sb.append(getClassName(isThrowException)).append(getGenericDefinition(isThrowException));
+            sb.append(" constant(boolean value) {").append("\n");
+            sb.append("        return");
+            if (hasGeneric(isThrowException)) {
+                sb.append(" (").append(getClassName(isThrowException)).append(getGenericDefinition(isThrowException)).append(")");
+            }
+            sb.append(" (value ? DEFAULT_TRUE : DEFAULT_FALSE);").append("\n");
+            sb.append("    }").append("\n");
+            sb.append("\n");
+        } else {
+            sb.append("    /**").append("\n");
+            sb.append("     * 一个空实现的实例，它总是返回 ");
+            if (returnType != null) {
+                if (returnType == OBJECT) {
+                    sb.append("null 值。");
+                } else {
+                    sb.append("BasicConstant.").append(returnType).append("_ZERO 值。");
+                }
+            } else {
+                sb.append("。");
+            }
+            sb.append("\n");
+            sb.append("     */").append("\n");
+            sb.append("    ").append(getClassName(isThrowException)).append(getGenericUnknown(isThrowException)).append(" EMPTY = (").append(getParamInvocation()).append(") -> ");
+            if (returnType != null) {
+                if (returnType == OBJECT) {
+                    sb.append("null;");
+                } else {
+                    sb.append("BasicConstant.").append(returnType).append("_ZERO;");
+                }
+                sb.append("\n");
+            } else {
+                sb.append("{").append("\n");
+                sb.append("    };").append("\n");
+            }
+            sb.append("\n");
+            sb.append("    /**").append("\n");
+            sb.append("     * 返回一个空实现的实例，它总是返回 ");
+            if (returnType != null) {
+                if (returnType == OBJECT) {
+                    sb.append("null 值。");
+                } else {
+                    sb.append("{@link BasicConstant#").append(returnType).append("_ZERO} 值。");
+                }
+            } else {
+                sb.append("。");
+            }
+            sb.append("\n");
+            sb.append("     *").append("\n");
+            sb.append("     * @return 获取一个空的函数式接口实例。").append("\n");
+            sb.append("     */").append("\n");
+            if (hasGeneric(isThrowException)) {
+                sb.append("    @SuppressWarnings(\"unchecked\")").append("\n");
+            }
+            sb.append("    static ");
+            String genericDeclaration = getGenericDeclaration(isThrowException);
+            if (!genericDeclaration.isEmpty()) {
+                sb.append(genericDeclaration).append(" ");
+            }
+            sb.append(getClassName(isThrowException)).append(getGenericDefinition(isThrowException));
+            sb.append(" empty() {").append("\n");
+            sb.append("        return");
+            if (hasGeneric(isThrowException)) {
+                sb.append(" (").append(getClassName(isThrowException)).append(getGenericDefinition(isThrowException)).append(")");
+            }
+            sb.append(" EMPTY;").append("\n");
+            sb.append("    }").append("\n");
+            sb.append("\n");
+            if (returnType != null) {
+                sb.append("    /**").append("\n");
+                sb.append("     * 创建一个始终返回指定常量值的函数式接口。").append("\n");
+                sb.append("     *").append("\n");
+                sb.append("     * @param value 常量值。").append("\n");
+                sb.append("     * @return 返回指定常量值的函数式接口。").append("\n");
+                sb.append("     */").append("\n");
+                sb.append("    static ");
+                if (!genericDeclaration.isEmpty()) {
+                    sb.append(genericDeclaration).append(" ");
+                }
+                sb.append(getClassName(isThrowException)).append(getGenericDefinition(isThrowException));
+                sb.append(" constant(").append(returnType.getReturnType()).append(" value) {").append("\n");
+                sb.append("        return (");
+                for (int i = 0; i < paramTypes.length; i++) {
+                    sb.append(paramTypes[i].getParamName(i)).append(", ");
+                }
+                sb.setLength(sb.length() - 2);
+                sb.append(") -> value;").append("\n");
+                sb.append("    }").append("\n");
+                sb.append("\n");
+            }
+        }
+
         // 方法注释
         sb.append("    /**").append("\n");
         sb.append("     * 对给定的 ").append(paramTypes.length).append(" 个参数进行操作");
         if (returnType != null) {
-            if (returnType == LambdaType.TEST) {
+            if (returnType == BOOLEAN) {
                 sb.append("，并返回一个布尔值。");
             } else {
                 sb.append("，并返回一个结果。");
@@ -258,7 +254,7 @@ class LambdaTemplate {
 
         // 返回值说明
         if (returnType != null) {
-            if (returnType == LambdaType.TEST) {
+            if (returnType == BOOLEAN) {
                 sb.append("     * @return 该方法返回一个布尔值，表示操作是否成功。");
             } else {
                 sb.append("     * @return 该方法返回一个结果，表示操作的结果。");
@@ -283,12 +279,7 @@ class LambdaTemplate {
         if (isThrowException) {
             sb.append("Throw");
         }
-        sb.append("(");
-        for (int i = 0; i < paramTypes.length; i++) {
-            sb.append(paramTypes[i].getParamType(i)).append(" ").append(paramTypes[i].getParamName(i)).append(", ");
-        }
-        sb.setLength(sb.length() - 2);
-        sb.append(")");
+        sb.append("(").append(getParamDeclaration()).append(")");
         if (isThrowException) {
             sb.append(" throws E");
         }
@@ -309,7 +300,7 @@ class LambdaTemplate {
 
             // 返回值说明
             if (returnType != null) {
-                if (returnType == LambdaType.TEST) {
+                if (returnType == BOOLEAN) {
                     sb.append("     * @return 该方法返回一个布尔值，表示操作是否成功。");
                 } else {
                     sb.append("     * @return 该方法返回一个结果，表示操作的结果。");
@@ -324,23 +315,11 @@ class LambdaTemplate {
             } else {
                 sb.append("void");
             }
-            sb.append(" ").append(methodName).append("(");
-
-            // 参数声明
-            for (int i = 0; i < paramTypes.length; i++) {
-                sb.append(paramTypes[i].getParamType(i)).append(" ").append(paramTypes[i].getParamName(i)).append(", ");
-            }
-            sb.setLength(sb.length() - 2);
-            sb.append(") {").append("\n");
+            sb.append(" ").append(methodName).append("(").append(getParamDeclaration()).append(") {").append("\n");
 
             // 实现逻辑
             sb.append("        try {").append("\n");
-            sb.append("            ").append(returnType != null ? "return " : "").append("this.").append(methodName).append("Throw").append("(");
-            for (int i = 0; i < paramTypes.length; i++) {
-                sb.append(paramTypes[i].getParamName(i)).append(", ");
-            }
-            sb.setLength(sb.length() - 2);
-            sb.append(");").append("\n");
+            sb.append("            ").append(returnType != null ? "return " : "").append("this.").append(methodName).append("Throw").append("(").append(getParamInvocation()).append(");").append("\n");
             sb.append("        } catch (Exception e) {").append("\n");
             sb.append("            throw new RuntimeException(\"Exception for '").append(methodName).append("Throw").append("'\", e);").append("\n");
             sb.append("        }").append("\n");
@@ -349,19 +328,5 @@ class LambdaTemplate {
         sb.append("}").append("\n");
 
         return sb.toString();
-    }
-
-    /**
-     * 将生成的代码写入文件
-     *
-     * @param directory 目标目录
-     * @param charset   字符集
-     * @throws IOException 如果写入过程中发生错误
-     */
-    public void writeToDirectory(Path directory, Charset charset) throws IOException {
-        Path path = directory.resolve(getClassName(false) + ".java");
-        Files.write(path, getResult(false).getBytes(charset));
-        path = directory.resolve(getClassName(true) + ".java");
-        Files.write(path, getResult(true).getBytes(charset));
     }
 }

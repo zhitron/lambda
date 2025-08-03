@@ -1,7 +1,9 @@
 package com.github.zhitron.lambda.predicate;
 
+import com.github.zhitron.BasicConstant;
+
 /**
- * 这是一个通用的 lambda 函数类，输入 2 个参的操作，并返回一个布尔值。支持抛出异常。
+ * 这是一个通用的 lambda 函数类，输入 2 个参数的操作，并返回一个布尔值。支持抛出异常。
  * 该接口扩展自 {@link TwicePredicateObject}，增加了异常处理能力。
  *
  * @param <T> 第 1 个参数类型。
@@ -11,6 +13,27 @@ package com.github.zhitron.lambda.predicate;
  */
 @FunctionalInterface
 public interface TwicePredicateObjectThrow<T, U, E extends Exception> extends TwicePredicateObject<T, U> {
+
+    /**
+     * 默认返回 true 的 TwicePredicateObjectThrow 实例。
+     */
+    TwicePredicateObjectThrow<?, ?, ?> DEFAULT_TRUE = (v1, v2) -> BasicConstant.BOOLEAN_TRUE;
+
+    /**
+     * 默认返回 false 的 TwicePredicateObjectThrow 实例。
+     */
+    TwicePredicateObjectThrow<?, ?, ?> DEFAULT_FALSE = (v1, v2) -> BasicConstant.BOOLEAN_FALSE;
+
+    /**
+     * 根据给定的布尔值返回对应的默认 TwicePredicateObjectThrow 实例。
+     *
+     * @param value 给定的布尔值。
+     * @return 如果 value 为 true，返回 DEFAULT_TRUE；否则返回 DEFAULT_FALSE。
+     */
+    @SuppressWarnings("unchecked")
+    static <T, U, E extends Exception> TwicePredicateObjectThrow<T, U, E> constant(boolean value) {
+        return (TwicePredicateObjectThrow<T, U, E>) (value ? DEFAULT_TRUE : DEFAULT_FALSE);
+    }
 
     /**
      * 对给定的 2 个参数进行操作，并返回一个布尔值。

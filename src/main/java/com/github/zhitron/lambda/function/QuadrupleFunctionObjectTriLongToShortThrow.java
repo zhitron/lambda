@@ -1,7 +1,9 @@
 package com.github.zhitron.lambda.function;
 
+import com.github.zhitron.BasicConstant;
+
 /**
- * 这是一个通用的 lambda 函数类，输入 4 个参的操作，并返回一个结果。支持抛出异常。
+ * 这是一个通用的 lambda 函数类，输入 4 个参数的操作，并返回一个结果。支持抛出异常。
  * 该接口扩展自 {@link QuadrupleFunctionObjectTriLongToShort}，增加了异常处理能力。
  *
  * @param <T> 第 1 个参数类型。
@@ -10,6 +12,31 @@ package com.github.zhitron.lambda.function;
  */
 @FunctionalInterface
 public interface QuadrupleFunctionObjectTriLongToShortThrow<T, E extends Exception> extends QuadrupleFunctionObjectTriLongToShort<T> {
+
+    /**
+     * 一个空实现的实例，它总是返回 BasicConstant.SHORT_ZERO 值。
+     */
+    QuadrupleFunctionObjectTriLongToShortThrow<?, ?> EMPTY = (v1, v2, v3, v4) -> BasicConstant.SHORT_ZERO;
+
+    /**
+     * 返回一个空实现的实例，它总是返回 {@link BasicConstant#SHORT_ZERO} 值。
+     *
+     * @return 获取一个空的函数式接口实例。
+     */
+    @SuppressWarnings("unchecked")
+    static <T, E extends Exception> QuadrupleFunctionObjectTriLongToShortThrow<T, E> empty() {
+        return (QuadrupleFunctionObjectTriLongToShortThrow<T, E>) EMPTY;
+    }
+
+    /**
+     * 创建一个始终返回指定常量值的函数式接口。
+     *
+     * @param value 常量值。
+     * @return 返回指定常量值的函数式接口。
+     */
+    static <T, E extends Exception> QuadrupleFunctionObjectTriLongToShortThrow<T, E> constant(short value) {
+        return (v1, v2, v3, v4) -> value;
+    }
 
     /**
      * 对给定的 4 个参数进行操作，并返回一个结果。

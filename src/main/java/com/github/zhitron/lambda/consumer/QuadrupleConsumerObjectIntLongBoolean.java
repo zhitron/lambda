@@ -1,13 +1,29 @@
 package com.github.zhitron.lambda.consumer;
 
 /**
- * 这是一个通用的 lambda 函数类，输入 4 个参的操作。
+ * 这是一个通用的 lambda 函数类，输入 4 个参数的操作。
  *
  * @param <T> 第 1 个参数类型。
  * @author zhitron
  */
 @FunctionalInterface
 public interface QuadrupleConsumerObjectIntLongBoolean<T> {
+
+    /**
+     * 一个空实现的实例，它总是返回 。
+     */
+    QuadrupleConsumerObjectIntLongBoolean<?> EMPTY = (v1, v2, v3, v4) -> {
+    };
+
+    /**
+     * 返回一个空实现的实例，它总是返回 。
+     *
+     * @return 获取一个空的函数式接口实例。
+     */
+    @SuppressWarnings("unchecked")
+    static <T> QuadrupleConsumerObjectIntLongBoolean<T> empty() {
+        return (QuadrupleConsumerObjectIntLongBoolean<T>) EMPTY;
+    }
 
     /**
      * 对给定的 4 个参数进行操作。

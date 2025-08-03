@@ -1,7 +1,7 @@
 package com.github.zhitron.lambda.consumer;
 
 /**
- * 这是一个通用的 lambda 函数类，输入 4 个参的操作。支持抛出异常。
+ * 这是一个通用的 lambda 函数类，输入 4 个参数的操作。支持抛出异常。
  * 该接口扩展自 {@link QuadrupleConsumerLongDoubleIntDouble}，增加了异常处理能力。
  *
  * @param <E> 异常类型，必须是 {@link Exception} 的子类
@@ -9,6 +9,22 @@ package com.github.zhitron.lambda.consumer;
  */
 @FunctionalInterface
 public interface QuadrupleConsumerLongDoubleIntDoubleThrow<E extends Exception> extends QuadrupleConsumerLongDoubleIntDouble {
+
+    /**
+     * 一个空实现的实例，它总是返回 。
+     */
+    QuadrupleConsumerLongDoubleIntDoubleThrow<?> EMPTY = (v1, v2, v3, v4) -> {
+    };
+
+    /**
+     * 返回一个空实现的实例，它总是返回 。
+     *
+     * @return 获取一个空的函数式接口实例。
+     */
+    @SuppressWarnings("unchecked")
+    static <E extends Exception> QuadrupleConsumerLongDoubleIntDoubleThrow<E> empty() {
+        return (QuadrupleConsumerLongDoubleIntDoubleThrow<E>) EMPTY;
+    }
 
     /**
      * 对给定的 4 个参数进行操作。

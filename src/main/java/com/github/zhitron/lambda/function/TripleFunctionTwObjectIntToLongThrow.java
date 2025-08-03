@@ -1,7 +1,9 @@
 package com.github.zhitron.lambda.function;
 
+import com.github.zhitron.BasicConstant;
+
 /**
- * 这是一个通用的 lambda 函数类，输入 3 个参的操作，并返回一个结果。支持抛出异常。
+ * 这是一个通用的 lambda 函数类，输入 3 个参数的操作，并返回一个结果。支持抛出异常。
  * 该接口扩展自 {@link TripleFunctionTwObjectIntToLong}，增加了异常处理能力。
  *
  * @param <T> 第 1 个参数类型。
@@ -11,6 +13,31 @@ package com.github.zhitron.lambda.function;
  */
 @FunctionalInterface
 public interface TripleFunctionTwObjectIntToLongThrow<T, U, E extends Exception> extends TripleFunctionTwObjectIntToLong<T, U> {
+
+    /**
+     * 一个空实现的实例，它总是返回 BasicConstant.LONG_ZERO 值。
+     */
+    TripleFunctionTwObjectIntToLongThrow<?, ?, ?> EMPTY = (v1, v2, v3) -> BasicConstant.LONG_ZERO;
+
+    /**
+     * 返回一个空实现的实例，它总是返回 {@link BasicConstant#LONG_ZERO} 值。
+     *
+     * @return 获取一个空的函数式接口实例。
+     */
+    @SuppressWarnings("unchecked")
+    static <T, U, E extends Exception> TripleFunctionTwObjectIntToLongThrow<T, U, E> empty() {
+        return (TripleFunctionTwObjectIntToLongThrow<T, U, E>) EMPTY;
+    }
+
+    /**
+     * 创建一个始终返回指定常量值的函数式接口。
+     *
+     * @param value 常量值。
+     * @return 返回指定常量值的函数式接口。
+     */
+    static <T, U, E extends Exception> TripleFunctionTwObjectIntToLongThrow<T, U, E> constant(long value) {
+        return (v1, v2, v3) -> value;
+    }
 
     /**
      * 对给定的 3 个参数进行操作，并返回一个结果。

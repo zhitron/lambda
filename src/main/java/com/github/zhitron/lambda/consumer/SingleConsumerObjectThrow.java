@@ -1,7 +1,7 @@
 package com.github.zhitron.lambda.consumer;
 
 /**
- * 这是一个通用的 lambda 函数类，输入 1 个参的操作。支持抛出异常。
+ * 这是一个通用的 lambda 函数类，输入 1 个参数的操作。支持抛出异常。
  * 该接口扩展自 {@link SingleConsumerObject}，增加了异常处理能力。
  *
  * @param <T> 第 1 个参数类型。
@@ -10,6 +10,22 @@ package com.github.zhitron.lambda.consumer;
  */
 @FunctionalInterface
 public interface SingleConsumerObjectThrow<T, E extends Exception> extends SingleConsumerObject<T> {
+
+    /**
+     * 一个空实现的实例，它总是返回 。
+     */
+    SingleConsumerObjectThrow<?, ?> EMPTY = (v1) -> {
+    };
+
+    /**
+     * 返回一个空实现的实例，它总是返回 。
+     *
+     * @return 获取一个空的函数式接口实例。
+     */
+    @SuppressWarnings("unchecked")
+    static <T, E extends Exception> SingleConsumerObjectThrow<T, E> empty() {
+        return (SingleConsumerObjectThrow<T, E>) EMPTY;
+    }
 
     /**
      * 对给定的 1 个参数进行操作。

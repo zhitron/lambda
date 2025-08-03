@@ -1,7 +1,7 @@
 package com.github.zhitron.lambda.consumer;
 
 /**
- * 这是一个通用的 lambda 函数类，输入 3 个参的操作。支持抛出异常。
+ * 这是一个通用的 lambda 函数类，输入 3 个参数的操作。支持抛出异常。
  * 该接口扩展自 {@link TripleConsumerTwObjectDouble}，增加了异常处理能力。
  *
  * @param <T> 第 1 个参数类型。
@@ -11,6 +11,22 @@ package com.github.zhitron.lambda.consumer;
  */
 @FunctionalInterface
 public interface TripleConsumerTwObjectDoubleThrow<T, U, E extends Exception> extends TripleConsumerTwObjectDouble<T, U> {
+
+    /**
+     * 一个空实现的实例，它总是返回 。
+     */
+    TripleConsumerTwObjectDoubleThrow<?, ?, ?> EMPTY = (v1, v2, v3) -> {
+    };
+
+    /**
+     * 返回一个空实现的实例，它总是返回 。
+     *
+     * @return 获取一个空的函数式接口实例。
+     */
+    @SuppressWarnings("unchecked")
+    static <T, U, E extends Exception> TripleConsumerTwObjectDoubleThrow<T, U, E> empty() {
+        return (TripleConsumerTwObjectDoubleThrow<T, U, E>) EMPTY;
+    }
 
     /**
      * 对给定的 3 个参数进行操作。

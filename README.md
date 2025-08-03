@@ -23,7 +23,7 @@
 <dependency>
     <groupId>com.github.zhitron</groupId>
     <artifactId>lambda</artifactId>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
 </dependency>
 ```
 
@@ -40,142 +40,46 @@
 
 本项目提供了多种函数式接口，并支持返回值类型和异常处理。适用于简化 Java 中的 Lambda 表达式使用。
 
-### ✅ 1. 函数式接口分类
+基于项目结构和已有 README 内容，我将为项目生成更完整的使用文档。
 
-#### 1.1 无参函数（NonParameter）
+## 🧩 功能特性
 
-适用于不接受任何参数的 Lambda 函数，支持以下返回类型：
+### 1. 函数式接口分类
 
-- `ToAny<R>`：通用泛型返回值
-- `ToVoid`：无返回值
-- `ToBoolean`：布尔值
-- `ToChar`：字符值
-- `ToByte`：字节值
-- `ToShort`：短整型值
-- `ToInt`：整型值
-- `ToLong`：长整型值
-- `ToFloat`：浮点值
-- `ToDouble`：双精度浮点值
-
-同时支持抛出异常的版本：NonParameterThrow
-
-#### 1.2 单参数函数（SingleParameter）
-
-适用于接受一个参数的 Lambda 函数，支持上述相同类型的返回值。
-接口命名示例：`SingleParameter.ToAny<T, R>`
-
-支持异常处理的版本：SingleParameterThrow
-
-#### 1.3 双参数函数（TwiceParameter）
-
-适用于接受两个参数的 Lambda 函数。
-接口命名示例：`TwiceParameter.ToAny<T, U, R>`
-
-支持异常处理的版本：TwiceParameterThrow
-
-#### 1.4 三参数函数（TripleParameter）
-
-适用于接受三个参数的 Lambda 函数。
-接口命名示例：`TripleParameter.ToAny<T, U, V, R>`
-
-支持异常处理的版本：TripleParameterThrow
-
-#### 1.5 四参数函数（QuadrupleParameter）
-
-适用于接受四个参数的 Lambda 函数。
-接口命名示例：`QuadrupleParameter.ToAny<T, U, V, W, R>`
-
-支持异常处理的版本：QuadrupleParameterThrow
-
-#### 1.6 其它函数
-
-- 消费器函数：`com.github.zhitron.lambda.consumer`
-- 处理器函数：`com.github.zhitron.lambda.function`
-- 断言器函数：`com.github.zhitron.lambda.predicate`
-- 提供器函数：`com.github.zhitron.lambda.supplier`
-
----
-
-### ✅ 2. 异常处理支持
-
-所有接口都提供两个版本：
-
-- **基础版本**：不抛出异常
-- **Throw 版本**：通过 `applyThrow(...)` 方法允许抛出检查性异常（checked exception），并默认将异常包装为 `RuntimeException`
-
-示例：
-
-```java
-SingleParameterThrow.ToAny<String, Integer, Exception> parser = Integer::parseInt;
-Integer result = parser.apply("123"); // 正常调用
+```
+com.github.zhitron.lambda
+├── consumer/          # 消费者接口，用于接收参数并执行操作，无返回值。
+├── function/          # 函数器接口，用于接收参数并返回一个结果，支持多种返回类型（Object, char, byte, short, int, long, float, double）。
+├── operator/          # 操作器接口，用于接收同一类型的参数并返回相同类型的结果，支持多种数据类型（Object, char, byte, short, int, long, float, double, boolean）。
+├── predicate/         # 断言器接口，用于接收参数并进行条件判断，返回 boolean 类型结果。
+├── supplier/          # 提供者接口，用于提供数据或值，不接收参数，支持多种返回类型（Object, char, byte, short, int, long, float, double, boolean）。
+├── NonParameter*      # 无参函数接口
+├── SingleParameter*   # 单参函数接口
+├── TwiceParameter*    # 双参函数接口
+├── TripleParameter*   # 三参函数接口
+└── QuadrupleParameter*# 四参函数接口
 ```
 
----
+### 2. 接口命名方式
 
-### ✅ 3. 典型使用场景
+* `com.github.zhitron.lambda.consumer`包下Consumer消费者接口：`(Single|Twice|Triple|Quadruple)Consumer(Arguments)[Throw]`。
+* `com.github.zhitron.lambda.function`包下Function函数器接口：`(Single|Twice|Triple|Quadruple)Function(Arguments)To(ReturnType)[Throw]`。
+* `com.github.zhitron.lambda.operator`包下Operator操作器接口：`(ReturnType)(Single|Twice|Triple|Quadruple)Operator[Throw]`。
+* `com.github.zhitron.lambda.predicate`包下Predicate断言器接口：`(Single|Twice|Triple|Quadruple)Predicate(Arguments)[Throw]`。
+* `com.github.zhitron.lambda.supplier`包下Supplier提供者接口：`(ReturnType)Supplier[Throw]`。
 
-- 简化集合遍历与操作（如 `forEach`, `map`, `filter` 等）
-- 定义带异常处理的回调逻辑
-- 构建链式 API 或 DSL
-- 替代匿名内部类，提升代码可读性和复用性
+**命名说明：**
 
----
-
-### ✅ 4. 示例代码
-
-#### 示例 1：使用无参函数
-
-```java
-package com.github.zhitron.lambda;
-
-/**
- * @author zhitron
- */
-public class Test {
-    public static void main(String[] args) {
-        NonParameter.ToInt random = () -> new Random().nextInt(100);
-        System.out.println(random.apply());
-    }
-}
-```
-
-#### 示例 2：使用单参函数
-
-```java
-package com.github.zhitron.lambda;
-
-/**
- * @author zhitron
- */
-public class Test {
-    public static void main(String[] args) {
-        SingleParameter.ToBoolean<String> isEmpty = String::isEmpty;
-        System.out.println(isEmpty.apply(""));
-    }
-}
-```
-
-#### 示例 3：使用双参函数 + 异常处理
-
-```java
-package com.github.zhitron.lambda;
-
-/**
- * @author zhitron
- */
-public class Test {
-    public static void main(String[] args) {
-        TwiceParameterThrow.ToAny<String, String, Integer, NumberFormatException> parse = Integer::valueOf;
-
-        try {
-            int result = parse.apply("123", "456");
-            System.out.println(result);
-        } catch (NumberFormatException e) {
-            e.printStackTrace(System.err);
-        }
-    }
-}
-```
+* Single，Twice，Triple，Quadruple分别代表接收一个参数，两个参数，三个参数，四个参数。
+* Arguments，ReturnType分别代表参数类型和返回类型。
+* Throw表示接口是否抛出异常。
+* Arguments命名细节如下：
+  * 如果所有参数一致，则直接使用参数类型作为命名。
+  * 如果参数类型不一致:
+    1. 无连续一样参数，则使用参数类型列表命名，如参数类型为`int, String, boolean`，则命名为`IntStringBoolean`。
+    2. 有连续一样参数，两个连续使用前缀`Tw`,三个连续使用前缀`Tri`。
+       * 如参数类型为`int, int, String`，则命名为`TwIntString`。
+       * 如参数类型为`int, int, int, String`，则命名为`TriIntString`。
 
 ---
 

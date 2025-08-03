@@ -7,10 +7,6 @@ package com.github.zhitron.lambda;
  * @author zhitron
  */
 enum LambdaType {
-    /**
-     * 测试类型，用于内部测试用途。
-     */
-    TEST("boolean", "Boolean", null, null, null),
 
     /**
      * 布尔类型 Lambda 元信息。
@@ -125,9 +121,6 @@ enum LambdaType {
      * @throws IllegalArgumentException 如果参数索引超出范围或不支持当前类型
      */
     public String getParamType(int index) {
-        if (this == TEST) {
-            throw new IllegalArgumentException("Not supported for TEST");
-        }
         if (paramGenericTypes != null && paramGenericTypes.length != 0) {
             if (index >= paramGenericTypes.length) {
                 throw new IllegalArgumentException("the number of parameters is incorrect");
