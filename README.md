@@ -120,5 +120,7 @@ git clone https://github.com/zhitron/lambda.git
 
 ## 📎 License
 
-Apache License
+Apache License, Version 2.0  
+详见 [LICENSE](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
+---
